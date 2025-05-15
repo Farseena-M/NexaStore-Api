@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import productSchema from '../models/productSchema';
 import userSchema from '../models/userSchema';
+import subCategorySchema from '../models/subCategorySchema';
 
 export const addProduct = async (req: Request, res: Response): Promise<any> => {
     try {
@@ -154,10 +155,31 @@ export const updateProduct = async (req: Request, res: Response): Promise<any> =
 
 
 
+export const deleteProduct = async (req: Request, res: Response): Promise<any> => {
+    const { productId } = req.params;
+
+    try {
+        const product = await productSchema.findByIdAndDelete(productId);
+
+        if (!product) {
+            return res.status(404).json({ message: 'Product not found' });
+        }
+
+        res.status(200).json({ message: 'Product deleted successfully', deletedProduct: product });
+    } catch (error) {
+        console.error('Delete Error:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+
+
+
+
 
 export const addToWishlist = async (req: Request, res: Response): Promise<any> => {
-   const { productId } = req.body;
-    const { userId } = req.params; 
+    const { productId } = req.body;
+    const { userId } = req.params;
 
     try {
         const user = await userSchema.findById(userId);
@@ -189,4 +211,54 @@ export const getWishlistByUser = async (req: Request, res: Response): Promise<an
         res.status(500).json({ error: 'Server error' });
     }
 };
+
+
+
+
+export const searchProductsByName = async (req: Request, res: Response): Promise<any> => {
+    const { query } = req.query;
+
+    if (!query || typeof query !== 'string') {
+        return res.status(400).json({ message: 'Search query is required' });
+    }
+
+    try {
+        const products = await productSchema.find({
+            title: { $regex: query, $options: 'i' }
+        });
+
+        res.status(200).json({ results: products });
+    } catch (error) {
+        console.error('Search Error:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+
+
+
+export const filterProductsBySubCategory = async (req: Request, res: Response): Promise<any> => {
+    const { subCategoryName } = req.query;
+
+    if (!subCategoryName || typeof subCategoryName !== 'string') {
+        return res.status(400).json({ message: 'subCategoryName query parameter is required' });
+    }
+
+    try {
+        const subCategory = await subCategorySchema.findOne({ name: subCategoryName });
+
+        if (!subCategory) {
+            return res.status(404).json({ message: 'Subcategory not found' });
+        }
+
+        const products = await productSchema.find({ subCategory: subCategory._id });
+
+        res.status(200).json(products);
+    } catch (error) {
+        console.error('Error filtering products by subcategory:', error);
+        res.status(500).json({ message: 'Server error', error });
+    }
+};
+
+
 
