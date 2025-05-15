@@ -7,8 +7,9 @@ export interface IVariant {
 }
 
 export interface IProduct extends Document {
-  name: string;
+  title: string;
   description: string;
   subCategory: Types.ObjectId;
   variants: IVariant[];
+  images: string[];
 }

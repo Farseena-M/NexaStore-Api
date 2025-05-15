@@ -8,10 +8,11 @@ const variantSchema = new mongoose.Schema<IVariant>({
 });
 
 const productSchema = new mongoose.Schema<IProduct>({
-    name: String,
+    title: String,
     description: String,
     subCategory: { type: mongoose.Schema.Types.ObjectId, ref: 'SubCategory' },
-    variants: [variantSchema]
+    variants: [variantSchema],
+    images: [{ type: String }]
 });
 
 export default mongoose.model<IProduct>('Product', productSchema);
