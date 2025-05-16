@@ -201,9 +201,8 @@ export const addToWishlist = async (req: Request, res: Response): Promise<any> =
 
 export const getWishlistByUser = async (req: Request, res: Response): Promise<any> => {
     const { userId } = req.params;
-
     try {
-        const user = await userSchema.findById(userId).populate('wishlist');
+        const user = await userSchema.findById(userId).populate('wishlist').exec();
         if (!user) return res.status(404).json({ error: 'User not found' });
 
         res.status(200).json({ wishlist: user.wishlist });
@@ -212,6 +211,32 @@ export const getWishlistByUser = async (req: Request, res: Response): Promise<an
     }
 };
 
+
+
+
+export const removeFromWishlist = async (req: Request, res: Response): Promise<any> => {
+    const { userId } = req.params;
+    const { productId } = req.body;
+
+    if (!productId) {
+        return res.status(400).json({ error: "Product ID is required" });
+    }
+
+    try {
+        const user = await userSchema.findById(userId);
+        if (!user) return res.status(404).json({ error: "User not found" });
+
+        user.wishlist = user.wishlist.filter(
+            (item: any) => item.toString() !== productId
+        );
+
+        await user.save();
+
+        res.status(200).json({ message: "Product removed from wishlist", wishlist: user.wishlist });
+    } catch (error) {
+        res.status(500).json({ error: "Server error" });
+    }
+};
 
 
 

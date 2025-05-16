@@ -38,7 +38,7 @@ export const Login = async (req: Request, res: Response): Promise<any> => {
 
         const token = generateToken(user._id.toString())
 
-        res.json({ token });
+        res.json({ _id: user._id, token });
     } catch (error: any) {
         return res.status(500).json({
             status: "failure",
