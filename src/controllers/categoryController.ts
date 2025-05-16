@@ -19,6 +19,22 @@ export const addCategory = async (req: Request, res: Response): Promise<any> => 
 
 
 
+export const getAllCategories = async (req: Request, res: Response): Promise<any> => {
+    try {
+        const categories = await categorySchema.find().populate({
+            path: 'subCategories',
+            select: 'name'
+        });
+        res.status(200).json({ message: `Fetched all categories successfully`, categories });
+    } catch (error: any) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
+
+
+
+
 export const addSubCategory = async (req: Request, res: Response): Promise<any> => {
     try {
         const { name, categoryId } = req.body;
@@ -35,5 +51,19 @@ export const addSubCategory = async (req: Request, res: Response): Promise<any> 
         res.status(201).json({ message: 'SubCategory created', subCategory });
     } catch (error: any) {
         res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
+
+
+
+
+
+export const getAllSubCategories = async (req: Request, res: Response): Promise<any> => {
+    try {
+        const subCategories = await subCategorySchema.find().populate('category', 'name');
+        res.status(200).json({ message: `Fetched all subcategories successfully`, subCategories });
+    } catch (error: any) {
+        res.status(500).json({ message: "Server error", error: error.message });
     }
 };
