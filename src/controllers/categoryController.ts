@@ -10,7 +10,7 @@ export const addCategory = async (req: Request, res: Response): Promise<any> => 
         const { name } = req.body;
         const category = new categorySchema({ name });
         await category.save();
-        res.status(201).json({ message: 'Category created', category });
+        res.status(201).json({ message: 'Category added successfully', category });
     } catch (error: any) {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
